@@ -7,19 +7,20 @@ from python_qt_binding import loadUi
 from python_qt_binding.QtGui import QWidget
 from python_qt_binding.QtCore import QTimer, Slot
 
-from mcptam.msg import SystemInfo
-from mcptam.msg import TrackerState
-from mcptam.srv import Reset
+from mcptam_msgs.msg import SystemInfo
+from mcptam_msgs.msg import TrackerState
+from mcptam_msgs.srv import Reset
 from std_srvs.srv import Empty
 
 class SysmonWidget(QWidget):
   _last_info_msg = SystemInfo()
   _last_tracker_msg = TrackerState()
-  _slam_init_srv = None
-  _slam_reset_srv = None
   _slam_info_sub = None
   _slam_tracker_sub = None
+  _slam_init_srv = None
+  _slam_reset_srv = None
   _mcptam_namespace = None
+  _num_received_msgs = 0
   def __init__(self, mcptam_namespace='mcptam'):
     
     # Init QWidget
@@ -31,8 +32,8 @@ class SysmonWidget(QWidget):
     loadUi(ui_file, self)
             
     # Subscribe to ROS topics and register callbacks
-    self._slam_info_sub = rospy.Subscriber(mcptam_namespace+'/info', SystemInfo, self.slam_info_cb)
-    self._slam_tracker_sub = rospy.Subscriber(mcptam_namespace+'/tracker', TrackerState, self.slam_tracker_cb)
+    self._slam_info_sub = rospy.Subscriber(mcptam_namespace+'/system_info', SystemInfo, self.slam_info_cb)
+    self._slam_tracker_sub = rospy.Subscriber(mcptam_namespace+'/tracker_state', TrackerState, self.slam_tracker_cb)
     
     # Initialize service call
     print('Waiting for MAV services')
@@ -40,7 +41,7 @@ class SysmonWidget(QWidget):
     rospy.wait_for_service(mcptam_namespace+'/reset')
     print('Connected to SLAM system')
     self._slam_init_srv = rospy.ServiceProxy(mcptam_namespace+'/init', Empty)
-    self._slam_init_srv = rospy.ServiceProxy(mcptam_namespace+'/reset', Reset)
+    self._slam_reset_srv = rospy.ServiceProxy(mcptam_namespace+'/reset', Reset)
    
     # init and start update timer for data, the timer calls the function update_info all 40ms    
     self._update_info_timer = QTimer(self)
@@ -65,24 +66,11 @@ class SysmonWidget(QWidget):
     info_text = 'Waiting for MAV connection'
     if self._num_received_msgs > 0:
       # Tracker FPS
-      info_text = 'fps = %.2f' + str(self._last_info_msg.dFPS)
+      info_text = 'fps = %.2f' % self._last_info_msg.dFPS
       info_text += '\n'
       # System State
       info_text += self._last_info_msg.message
       info_text += '\n'
-      # Global State
-      if self._last_tracker_msg.bLost:
-        info_text += '**TRACKER LOST**'
-        info_text += '\n'
-      info_text += 'Global tracking state : '
-      if self._last_tracker_msg.mTrackingQuality == 0:
-        info_text += '\t Not tracking'
-      elif self._last_tracker_msg.mTrackingQuality == 1:
-        info_text += '\t Tracking bad '
-      elif self._last_tracker_msg.mTrackingQuality == 2:
-        info_text += '\t Tracking poor '
-      elif self._last_tracker_msg.mTrackingQuality == 3:
-        info_text += '\t Tracking good'
 
     # set info text
     self.mcptam_info_label.setText(info_text)
@@ -101,13 +89,13 @@ class SysmonWidget(QWidget):
     
   def slam_init(self):
     try:
-        r = slam_init_srv() # handle response TODO
+        r = _slam_init_srv() # handle response TODO
     except rospy.ServiceException as exc:
         print("Init request failure" + str(exc))
 
   def slam_reset(self):
     try:
-        r = slam_reset_srv(true, false) # handle response TODO
+        r = _slam_reset_srv(true, false) # handle response TODO
     except rospy.ServiceException as exc:
         print("Reset request failure" + str(exc))
 

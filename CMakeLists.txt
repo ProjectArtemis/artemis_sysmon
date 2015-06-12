@@ -5,7 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   rqt_gui
   rqt_gui_py
-  mcptam
+  mcptam_msgs
 )
 catkin_package()
 catkin_python_setup()

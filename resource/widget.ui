@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SysmonWidget</class>
+ <widget class="QWidget" name="SysmonWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>445</width>
+    <height>166</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SVO</string>
+  </property>
+  <widget class="QLabel" name="mcptam_info_label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>411</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Current angular velocity</string>
+   </property>
+   <property name="text">
+    <string>Status Message</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="button_reset">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>130</y>
+     <width>100</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Reset velocities to zero</string>
+   </property>
+   <property name="text">
+    <string>Reset SLAM</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="button_quit">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>130</y>
+     <width>85</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="button_start">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>130</y>
+     <width>85</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Init SLAM</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
